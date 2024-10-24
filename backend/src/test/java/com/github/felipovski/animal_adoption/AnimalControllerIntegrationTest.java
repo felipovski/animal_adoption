@@ -54,7 +54,8 @@ public class AnimalControllerIntegrationTest {
 
     @BeforeAll
     public static void setup() {
-        RestAssured.port = 8083;
+        postgresContainer.start();
+        RestAssured.port = getPostgresContainer().getFirstMappedPort();
     }
 
     @Test

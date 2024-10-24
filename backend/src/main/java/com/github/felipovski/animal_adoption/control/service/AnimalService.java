@@ -1,6 +1,8 @@
 package com.github.felipovski.animal_adoption.control.service;
 
 import com.github.felipovski.animal_adoption.control.dto.AnimalDto;
+import com.github.felipovski.animal_adoption.control.exception.custom.AnimalNotFoundByIdException;
+import com.github.felipovski.animal_adoption.control.mapper.AnimalMapper;
 import com.github.felipovski.animal_adoption.entity.model.Animal;
 import com.github.felipovski.animal_adoption.entity.model.enums.AnimalStatus;
 import com.github.felipovski.animal_adoption.entity.repository.AnimalRepository;
@@ -20,8 +22,11 @@ public class AnimalService {
 
     private final AnimalRepository animalRepository;
 
-    public AnimalService(AnimalRepository animalRepository) {
+    private final AnimalMapper animalMapper;
+
+    public AnimalService(AnimalRepository animalRepository, AnimalMapper animalMapper) {
         this.animalRepository = animalRepository;
+        this.animalMapper = animalMapper;
     }
 
     public List<Animal> getAvailableAnimals() {
@@ -29,27 +34,40 @@ public class AnimalService {
     }
 
     public List<AnimalDto> listAll() {
-        return null;
+        return animalMapper.toDtoList(animalRepository.findAll());
     }
 
     public AnimalDto findById(Long id) {
-        return null;
+        return animalRepository.findById(id)
+                .map(animalMapper::toDto)
+                .orElse(null);
     }
 
     public List<AnimalDto> getAnimals(Pageable pageable) {
         Page<Animal> page = animalRepository.findAll(pageable);
-        return null;
+        return animalMapper.toDtoList(page.stream().toList());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long persistAnimal(@Valid AnimalDto dto) {
-        return null;
+        var animal = animalMapper.fromDto(dto);
+        var persisted = animalRepository.save(animal);
+        return persisted.getId();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    //    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AnimalDto updateAnimal(Long id, @Valid AnimalDto dto) {
 
-      return null;
+        var entity = animalRepository.findById(id)
+                .orElseThrow(AnimalNotFoundByIdException::new);
+        entity.setName(dto.name());
+        entity.setCategory(dto.category());
+        entity.setStatus(dto.status());
+        entity.setDescription(dto.description());
+        entity.setBirthDate(dto.birthDate());
+        entity.setImageUrl(dto.imageUrl());
+
+        return animalMapper.toDto(animalRepository.save(entity));
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -60,6 +78,12 @@ public class AnimalService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AnimalDto updateStatus(Long id, String status) {
-        return null;
+        return animalRepository.findById(id)
+                .map(animal -> {
+                    animal.setStatus(AnimalStatus.getByStatus(status));
+                    var updated = animalRepository.save(animal);
+                    return animalMapper.toDto(updated);
+                })
+                .orElseThrow(AnimalNotFoundByIdException::new);
     }
 }

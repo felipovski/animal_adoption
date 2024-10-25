@@ -1,6 +1,7 @@
 package com.github.felipovski.animal_adoption;
 
 import com.github.felipovski.animal_adoption.control.dto.AnimalDto;
+import com.github.felipovski.animal_adoption.control.dto.AnimalResponseDto;
 import com.github.felipovski.animal_adoption.control.mapper.AnimalMapper;
 import com.github.felipovski.animal_adoption.control.service.AnimalService;
 import com.github.felipovski.animal_adoption.entity.model.Animal;
@@ -64,12 +65,12 @@ class AnimalServiceTest {
 
     @Test
     void testFindById() {
-        AnimalDto mockAnimalDto = new AnimalDto("Channel", "Amistoso", "url", AnimalCategory.CAT, Instant.now(), AnimalStatus.AVAILABLE);
+        AnimalResponseDto mockAnimalDto = new AnimalResponseDto(2L, "Channel", "Amistoso", "url", AnimalCategory.CAT, Instant.now(), AnimalStatus.AVAILABLE);
 
-        when(animalRepository.findById(1L)).thenReturn(Optional.of(mockAnimal));
+        when(animalRepository.findById(2L)).thenReturn(Optional.of(mockAnimal));
         when(animalMapper.toDto(mockAnimal)).thenReturn(mockAnimalDto);
 
-        var animalDto = animalService.findById(1L);
+        var animalDto = animalService.findById(2L);
 
         assertNotNull(animalDto);
         assertEquals("Channel", animalDto.name());
@@ -90,13 +91,13 @@ class AnimalServiceTest {
     @Test
     void testGetAnimalsPaged() {
         var now = Instant.now();
-        AnimalDto mockAnimalDto = new AnimalDto("Stálin", "description", "url", AnimalCategory.DOG, now, AnimalStatus.AVAILABLE);
+        AnimalResponseDto mockAnimalDto = new AnimalResponseDto(1L, "Stálin", "description", "url", AnimalCategory.DOG, now, AnimalStatus.AVAILABLE);
 
         Page<Animal> animalPage = new PageImpl<>(List.of(mockAnimal));
         when(animalRepository.findAll(any(Pageable.class))).thenReturn(animalPage);
         when(animalMapper.toDtoList(animalPage.stream().toList())).thenReturn(List.of(mockAnimalDto));
 
-        List<AnimalDto> animals = animalService.getAnimals(Pageable.ofSize(10));
+        List<AnimalResponseDto> animals = animalService.getAnimals(Pageable.ofSize(10));
 
         assertEquals(1, animals.size());
         assertEquals("Stálin", mockAnimalDto.name());
@@ -117,13 +118,13 @@ class AnimalServiceTest {
 
     @Test
     void testUpdateAnimalStatus() {
-        AnimalDto updatedAnimalDto = new AnimalDto("Stálin", "Meu pequeno ditador", "url", AnimalCategory.DOG, Instant.now(), AnimalStatus.ADOPTED);
+        AnimalResponseDto updatedAnimalDto = new AnimalResponseDto(1L, "Stálin", "Meu pequeno ditador", "url", AnimalCategory.DOG, Instant.now(), AnimalStatus.ADOPTED);
 
         when(animalRepository.findById(1L)).thenReturn(Optional.of(mockAnimal));
         when(animalRepository.save(mockAnimal)).thenReturn(mockAnimal);
         when(animalMapper.toDto(mockAnimal)).thenReturn(updatedAnimalDto);
 
-        AnimalDto result = animalService.updateStatus(1L, "ADOPTED");
+        AnimalResponseDto result = animalService.updateStatus(1L, "ADOPTED");
 
         assertNotNull(result);
         assertEquals(AnimalStatus.ADOPTED, result.status());

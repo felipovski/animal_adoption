@@ -1,6 +1,7 @@
 package com.github.felipovski.animal_adoption.control.service;
 
 import com.github.felipovski.animal_adoption.control.dto.AnimalDto;
+import com.github.felipovski.animal_adoption.control.dto.AnimalResponseDto;
 import com.github.felipovski.animal_adoption.control.exception.custom.AnimalNotFoundByIdException;
 import com.github.felipovski.animal_adoption.control.mapper.AnimalMapper;
 import com.github.felipovski.animal_adoption.entity.model.Animal;
@@ -33,17 +34,17 @@ public class AnimalService {
         return animalRepository.findByStatus(AnimalStatus.AVAILABLE);
     }
 
-    public List<AnimalDto> listAll() {
+    public List<AnimalResponseDto> listAll() {
         return animalMapper.toDtoList(animalRepository.findAll());
     }
 
-    public AnimalDto findById(Long id) {
+    public AnimalResponseDto findById(Long id) {
         return animalRepository.findById(id)
                 .map(animalMapper::toDto)
                 .orElse(null);
     }
 
-    public List<AnimalDto> getAnimals(Pageable pageable) {
+    public List<AnimalResponseDto> getAnimals(Pageable pageable) {
         Page<Animal> page = animalRepository.findAll(pageable);
         return animalMapper.toDtoList(page.stream().toList());
     }
@@ -56,7 +57,7 @@ public class AnimalService {
     }
 
     //    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public AnimalDto updateAnimal(Long id, @Valid AnimalDto dto) {
+    public AnimalResponseDto updateAnimal(Long id, @Valid AnimalDto dto) {
 
         var entity = animalRepository.findById(id)
                 .orElseThrow(AnimalNotFoundByIdException::new);
@@ -77,7 +78,7 @@ public class AnimalService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public AnimalDto updateStatus(Long id, String status) {
+    public AnimalResponseDto updateStatus(Long id, String status) {
         return animalRepository.findById(id)
                 .map(animal -> {
                     animal.setStatus(AnimalStatus.getByStatus(status));

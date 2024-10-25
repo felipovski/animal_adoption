@@ -1,6 +1,7 @@
 package com.github.felipovski.animal_adoption;
 
 import com.github.felipovski.animal_adoption.control.dto.AnimalDto;
+import com.github.felipovski.animal_adoption.control.dto.AnimalResponseDto;
 import com.github.felipovski.animal_adoption.control.service.AnimalService;
 import com.github.felipovski.animal_adoption.entity.model.enums.AnimalCategory;
 import com.github.felipovski.animal_adoption.entity.model.enums.AnimalStatus;
@@ -67,7 +68,7 @@ public class AnimalControllerIntegrationTest {
                 .get("/animals")
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .extract().as(new TypeRef<List<AnimalDto>>() {
+                .extract().as(new TypeRef<List<AnimalResponseDto>>() {
                 });
 
         assertEquals(0, dtoList.size());
@@ -86,7 +87,7 @@ public class AnimalControllerIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
-                .as(AnimalDto.class);
+                .as(AnimalResponseDto.class);
 
         assertEquals("Stálin", animalDto.name());
         assertEquals("Pequeno ditador", animalDto.description());
@@ -130,7 +131,7 @@ public class AnimalControllerIntegrationTest {
             .put("/animals/{id}")
             .then()
             .statusCode(HttpStatus.OK.value())
-                .extract().as(AnimalDto.class);
+                .extract().as(AnimalResponseDto.class);
 
         assertEquals(AnimalStatus.ADOPTED, dto.status());
         assertEquals("Acha que é um bode", dto.description());
@@ -145,7 +146,7 @@ public class AnimalControllerIntegrationTest {
                 .get("/animals")
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .extract().as(new TypeRef<List<AnimalDto>>() {
+                .extract().as(new TypeRef<List<AnimalResponseDto>>() {
                 });
 
         assertEquals(3, dtoList.size());
@@ -172,7 +173,7 @@ public class AnimalControllerIntegrationTest {
                 .get("/animals")
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .extract().as(new TypeRef<List<AnimalDto>>() {
+                .extract().as(new TypeRef<List<AnimalResponseDto>>() {
                 });
 
         assertEquals(2, dtoList.size());

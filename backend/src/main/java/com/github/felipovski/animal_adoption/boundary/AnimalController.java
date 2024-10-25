@@ -1,5 +1,6 @@
 package com.github.felipovski.animal_adoption.boundary;
 
+import com.github.felipovski.animal_adoption.control.dto.AnimalResponseDto;
 import com.github.felipovski.animal_adoption.control.service.AnimalService;
 import com.github.felipovski.animal_adoption.control.dto.AnimalDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,12 +41,12 @@ public class AnimalController {
     @GetMapping
     @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE,
             array = @ArraySchema(schema = @Schema(implementation = AnimalDto.class))))
-    public ResponseEntity<List<AnimalDto>> getAllAnimals() {
+    public ResponseEntity<List<AnimalResponseDto>> getAllAnimals() {
         return ResponseEntity.ok(animalService.listAll());
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<AnimalDto>> filterAnimals(@ParameterObject Pageable pageable) {
+    public ResponseEntity<List<AnimalResponseDto>> filterAnimals(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(animalService.getAnimals(pageable));
     }
 
@@ -53,7 +54,7 @@ public class AnimalController {
     @GetMapping("/{id}")
     @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = AnimalDto.class)))
     @ApiResponse(responseCode = "204", description = "The animal is not found for a given identifier")
-    public ResponseEntity<AnimalDto> getAnimal(@PathVariable Long id) {
+    public ResponseEntity<AnimalResponseDto> getAnimal(@PathVariable Long id) {
         var dto = animalService.findById(id);
         if (Objects.nonNull(dto)) {
             return ResponseEntity.ok(dto);
@@ -78,7 +79,7 @@ public class AnimalController {
     @PutMapping("/{id}")
     @ApiResponse(responseCode = "200", description = "The updated animal", content = @Content(mediaType = APPLICATION_JSON_VALUE,
             schema = @Schema(implementation = AnimalDto.class)))
-    public ResponseEntity<AnimalDto> updateAnimal(@PathVariable Long id, @RequestBody AnimalDto dto) {
+    public ResponseEntity<AnimalResponseDto> updateAnimal(@PathVariable Long id, @RequestBody AnimalDto dto) {
         var updated = animalService.updateAnimal(id, dto);
         logger.debug("Hero updated with new valued {}", updated);
         return ResponseEntity.ok(updated);
@@ -88,7 +89,7 @@ public class AnimalController {
     @PutMapping("/{id}/status")
     @ApiResponse(responseCode = "200", description = "The updated animal", content = @Content(mediaType = APPLICATION_JSON_VALUE,
             schema = @Schema(implementation = AnimalDto.class)))
-    public ResponseEntity<AnimalDto> updateStatus(@PathVariable Long id, @RequestParam String status) {
+    public ResponseEntity<AnimalResponseDto> updateStatus(@PathVariable Long id, @RequestParam String status) {
 
         return ResponseEntity.ok(animalService.updateStatus(id, status));
     }

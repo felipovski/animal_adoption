@@ -56,7 +56,7 @@ public class AnimalService {
         return persisted.getId();
     }
 
-    //    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AnimalResponseDto updateAnimal(Long id, @Valid AnimalDto dto) {
 
         var entity = animalRepository.findById(id)

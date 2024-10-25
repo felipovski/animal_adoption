@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getAnimalById, updateAnimal, AnimalDto } from '../api/animalApi';
 
 const UpdateAnimalForm: React.FC = () => {
     const { id } = useParams<{ id: string }>();  // Captura o ID do animal da URL
+    const navigate = useNavigate();  // Hook para redirecionamento
     const [animal, setAnimal] = useState<AnimalDto>({
         name: '',
         description: '',
@@ -24,8 +25,9 @@ const UpdateAnimalForm: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (id) {
-            await updateAnimal(parseInt(id), animal); // Converte o ID para número antes de usá-lo
-            alert('Animal updated successfully!');
+            await updateAnimal(parseInt(id), animal);
+            alert('Animal atualizado com sucesso!');
+            navigate('/');
         }
     };
 

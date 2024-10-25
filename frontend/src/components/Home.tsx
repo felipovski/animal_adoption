@@ -7,22 +7,19 @@ const Home: React.FC = () => {
     const navigate = useNavigate();
     const [animals, setAnimals] = useState<AnimalDto[]>([]);
 
-    // Carrega os animais ao montar o componente
     useEffect(() => {
         loadAnimals();
     }, []);
 
-    // Função para carregar os animais da API
     const loadAnimals = async () => {
         const data = await getAnimals();
         setAnimals(data);
     };
 
-    // Função para deletar o animal
     const handleDelete = async (id: number) => {
-        if (window.confirm("Are you sure you want to delete this animal?")) {
+        if (window.confirm("Tem certeza que deseja remover o animal da aplicação?")) {
             await deleteAnimal(id);
-            loadAnimals(); // Atualiza a lista após a deleção
+            loadAnimals();
         }
     };
 

@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # Serviço PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: animaldb
+    environment:
+      POSTGRES_DB: animaldb
+      POSTGRES_USER: animaluser
+      POSTGRES_PASSWORD: animalpass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/main/resources/db/import.sql:/docker-entrypoint-initdb.d/import.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - animal_adoption_network
+
+  # Backend (Spring Boot - API de Adoção de Animais)
+  backend:
+    image: animal-adoption-api:latest
+    container_name: animal_adoption_backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/animaldb
+      SPRING_DATASOURCE_USERNAME: animaluser
+      SPRING_DATASOURCE_PASSWORD: animalpass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      - postgres
+    ports:
+      - "8082:8082"
+    networks:
+      - animal_adoption_network
+
+  # Frontend (React ou outra tecnologia de frontend)
+  frontend:
+    image: animal-adoption-frontend:latest
+    container_name: animal_adoption_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - animal_adoption_network
+
+# Volumes persistentes
+volumes:
+  postgres_data:
+
+# Rede compartilhada
+networks:
+  animal_adoption_network:
+    driver: bridge
